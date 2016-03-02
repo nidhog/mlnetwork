@@ -1,0 +1,12 @@
+import os
+include_stmt = "#include"
+import_stmt = "#import"
+directory = "multiplenetwork"
+for dname, dirs, files in os.walk(directory):
+    for fname in files:
+        fpath = os.path.join(dname, fname)
+        with open(fpath) as f:
+            s = f.read()
+        s = s.replace(import_stmt, include_stmt)
+        with open(fpath, "w") as f:
+            f.write(s)

@@ -6,9 +6,9 @@
  * Version: 0.0.1
  */
 
-#import "transformation.h"
-#import <set>
-#import <iostream>
+#include "transformation.h"
+#include <set>
+#include <iostream>
 
 const std::string SEP = "|";
 
