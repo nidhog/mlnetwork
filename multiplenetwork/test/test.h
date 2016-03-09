@@ -32,6 +32,7 @@ void test_transformations();
 void test_random();
 void test_randomwalks();
 void test_evolution();
+void test_generation();
 void test_modularity();
 void test_community();
 void test_dynamics();

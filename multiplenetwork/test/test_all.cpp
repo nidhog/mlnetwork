@@ -32,6 +32,8 @@ int main(int argn, char* argv[]) {
 	test_transformations();
 	test_community();
 	test_dynamics();
+	//test_evolution();
+	test_generation();
 	/*
 	test_utils();
 	test_randomwalks();

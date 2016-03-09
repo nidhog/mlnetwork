@@ -1,4 +1,4 @@
-CXXFLAGS = -Iinclude -O2 -g -std=c++11 -Wall -fmessage-length=0
+CXXFLAGS = -Iinclude -O2 -g -std=c++11 -Wall -fmessage-length=0 -w
 
 OBJS = 	src/datastructures/*.cpp \
 		src/datastructures/components/*.cpp \
