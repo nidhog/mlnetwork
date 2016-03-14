@@ -59,7 +59,7 @@ void test_measures() {
 	if (xrelevance(mnet,u1,l1,INOUT) != 2.0/4.0) throw FailedUnitTestException("Wrong exclusive relevance, layer l1: " + to_string(xrelevance(mnet,u1,l1,INOUT)));
 	if (xrelevance(mnet,u1,layers,INOUT) != 1) throw FailedUnitTestException("Wrong exclusive relevance, both layers: " + to_string(xrelevance(mnet,u1,layers,INOUT)));
 	std::cout << "done!" << std::endl;
-/*
+
 	std::cout << "Testing jaccard similarity...";
 	MLNetworkSharedPtr mnet5 = read_multilayer("test/io5.mpx","mlnet 5",',');
 	if (jaccard_similarity(mnet5,layers) != 4.0/7.0) throw FailedUnitTestException("Wrong layer similarity");
@@ -68,7 +68,7 @@ void test_measures() {
 	std::cout << "Testing triangle jaccard similarity...";
 	if (jaccard_triangle_similarity(mnet5,layers) != 1.0/2.0) throw FailedUnitTestException("Wrong jaccard triangle layer similarity: " + to_string(jaccard_triangle_similarity(mnet5,layers)));
 	std::cout << "done!" << std::endl;
-*/
+
 	std::cout << "Computing multilayer distance between all pairs of vertexes...";
 	// The result is stored in the variable paths, where for each target vertex (from source U0) we obtain a set of shortest paths
 	hash<ActorSharedPtr,std::set<distance> > dists = pareto_distance(mnet, mnet->get_actor("U0"));

@@ -13,7 +13,7 @@ using namespace mlnet;
 void test_generation() {
 	{
 		test_begin("GENERATION");
-	log("[generation Test R1] N1: larger independent, N2: smaller independent and with basic random graph generation model");
+	log("[Generation Test R1] N1: larger independent, N2: smaller independent and with basic random graph generation model");
 	// create multiplex network
 	MLNetworkSharedPtr mnet = MLNetwork::create("synt1");
 	LayerSharedPtr layer1 = mnet->add_layer("L1",true);
@@ -29,12 +29,12 @@ void test_generation() {
 	std::vector<EvolutionModel*> evolution_model = {&ba, &ra};
 	evolve(mnet,num_of_steps,num_of_actors,pr_no_event,pr_internal_event,dependency,evolution_model);
 	log(mnet->to_string());
-	//log("Edge Jaccard similarity: " + to_string(jaccard_similarity(mnet,layer1,layer2)));
+	log("Edge Jaccard similarity: " + to_string(jaccard_similarity(mnet,layer1,layer2)));
 	log("Assortativity: " + to_string(assortativity(mnet,layer1,layer2,OUT)));
 	}
 
 	{
-	log("[generation Test R2] N1: larger independent, N2: smaller dependent on N1, both with basic random graph generation model");
+	log("[Generation Test R2] N1: larger independent, N2: smaller dependent on N1, both with basic random graph generation model");
 	MLNetworkSharedPtr mnet = MLNetwork::create("synt1");
 	LayerSharedPtr layer1 = mnet->add_layer("L1",true);
 	LayerSharedPtr layer2 = mnet->add_layer("L2",true);
@@ -48,7 +48,7 @@ void test_generation() {
 	std::vector<EvolutionModel*> evolution_model = {&ra, &ra};
 	evolve(mnet,num_of_steps,num_of_actors,pr_no_event,pr_internal_event,dependency,evolution_model);
 	log(mnet->to_string());
-	//log("Edge Jaccard similarity: " + to_string(jaccard_similarity(mnet,layer1,layer2)));
+	log("Edge Jaccard similarity: " + to_string(jaccard_similarity(mnet,layer1,layer2)));
 	log("Assortativity: " + to_string(assortativity(mnet,layer1,layer2,OUT)));
 	}
 	test_end("GENERATION");

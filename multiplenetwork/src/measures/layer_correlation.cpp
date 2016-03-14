@@ -10,7 +10,16 @@
 #include "counter.h"
 #include <unordered_set>
 #include <algorithm>
-
+/*
+ * #Added includes
+ * */
+// #Revisit Dictionary-like stuff
+#include <iostream>
+#include <map>
+// typedef std::map<std::pair<int, int>, int> ActorDict;
+typedef std::map<int, double> DictById;
+typedef DictById::const_iterator ItById;
+/**/
 
 namespace mlnet {
 
@@ -209,7 +218,104 @@ double assortativity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer
 		return 0;
 	else return covariance/stdev1/stdev2;
 }
+/*
+ * #Added Assortativity
+ *
+ * */
+double actor_layer_centrality(ActorSharedPtr actor, LayerSharedPtr layer, std::string centrality_measure = "DEGREE"){
+	double node_centrality = 0;
+	//TODO Compute centrality
+	return node_centrality;
+}
 
+DictById get_actors_centralities(const MLNetworkSharedPtr& mnet, std::string centrality_measure = "DEGREE"){
+	DictById actor_centralities;
+	// Iterate over actors
+	for (ActorSharedPtr actor : mnet -> get_actors()){
+		// Find centrality of actor
+		actor_id = actor.get_id();
+		if ( actor_centralities.find(actor_id) == actor_centralities.end() ) {
+			actor_centralities[actor_id] = 0;
+		}
+		for (LayerSharedPtr layer: mnet -> get_layers()){
+			actor_centralities[actor_id] += actor_layer_centrality(actor, layer, centrality_measure);
+		}
+	}
+	//return dictionary with all actor centralities
+	return actor_centralities;
+}
+
+double general_assortativity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode) {
+	//std::cout << edges.size() << " " << flat.getNumEdges() << std::endl;
+	long num_actors_not_in_layer1 = 0;
+	long num_actors_not_in_layer2 = 0;
+	double mean_degree_layer1 = 0;
+	double mean_degree_layer2 = 0;
+
+	// Calculating degrees
+	for (NodeSharedPtr node1: mnet->get_nodes(layer1)) {
+		mean_degree_layer1 += mnet->neighbors(node1,mode).size();
+		NodeSharedPtr node2;
+		if ((node2 = mnet->get_node(node1->actor,layer2))) {
+			mean_degree_layer2 += mnet->neighbors(node2,mode).size();
+		}
+		else {
+			num_actors_not_in_layer2++;
+		}
+	}
+	// now processing the actors only in layer 2
+	for (NodeSharedPtr node2: mnet->get_nodes(layer2)) {
+		if (mnet->get_node(node2->actor,layer1)) {
+			// already computed in the previous for loop
+		}
+		else {
+			mean_degree_layer2 += mnet->neighbors(node2,mode).size();
+			num_actors_not_in_layer1++;
+		}
+	}
+	long num_actors = mnet->get_nodes(layer1).size() + num_actors_not_in_layer1;
+	mean_degree_layer1 /= num_actors;
+	mean_degree_layer2 /= num_actors;
+
+	// Calculating covariance and standard deviations
+	double covariance = 0;
+	double stdev1 = 0;
+	double stdev2 = 0;
+	for (NodeSharedPtr node1: mnet->get_nodes(layer1)) {
+		long degree1 = mnet->neighbors(node1,mode).size();
+		long degree2 = 0;
+		NodeSharedPtr node2;
+		if ((node2 = mnet->get_node(node1->actor,layer2))) {
+			degree2 = mnet->neighbors(node2,mode).size();
+		}
+		covariance += (degree1 - mean_degree_layer1)*(degree2 - mean_degree_layer2);
+		stdev1 += (degree1 - mean_degree_layer1)*(degree1 - mean_degree_layer1);
+		stdev2 += (degree2 - mean_degree_layer2)*(degree2 - mean_degree_layer2);
+	}
+	// now processing the actors only in layer 2
+	for (NodeSharedPtr node2: mnet->get_nodes(layer2)) {
+		if (mnet->get_node(node2->actor,layer1)) {
+			// already considered in the previous loop
+		}
+		else {
+			long degree2 = mnet->neighbors(node2,mode).size();
+			stdev1 += (0 - mean_degree_layer1)*(0 - mean_degree_layer1);
+			stdev2 += (degree2 - mean_degree_layer2)*(degree2 - mean_degree_layer2);
+			covariance += (0 - mean_degree_layer1)*(degree2 - mean_degree_layer2);
+		}
+	}
+	covariance /= num_actors;
+	stdev1 /= num_actors;
+	stdev1 = std::sqrt(stdev1);
+	stdev2 /= num_actors;
+	stdev2 = std::sqrt(stdev2);
+
+	if (stdev1==0 && stdev2==0)
+		return 1;
+	else if (stdev1==0 || stdev2==0)
+		return 0;
+	else return covariance/stdev1/stdev2;
+}
 /*
 double network_coverage(const MLNetwork& mnet, const std::set<std::string>& n1, const std::set<std::string>& n2) {
 	std::set<network_id> nets1, nets2;

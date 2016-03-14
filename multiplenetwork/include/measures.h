@@ -71,6 +71,7 @@ double jaccard_triangle_similarity(const MLNetworkSharedPtr& mnet, const LayerSh
 double coverage(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 
 double assortativity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode);
+double general_assortativty(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode);
 
 // FROM HERE, PORTING NOT COMPLETED YET
 

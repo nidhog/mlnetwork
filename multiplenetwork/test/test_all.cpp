@@ -28,8 +28,8 @@ int main(int argn, char* argv[]) {
 	try {
 	test_datastructures();
 	test_io();
-	test_measures();
-	test_transformations();
+	//test_measures();
+	//test_transformations();
 	test_community();
 	test_dynamics();
 	//test_evolution();

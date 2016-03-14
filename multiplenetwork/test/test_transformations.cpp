@@ -48,7 +48,7 @@ void test_transformations() {
 	test_end("flattening");
 
 	test_begin("projection");
-/*
+
 	std::cout << "Reading the multilayer network...";
 	MLNetworkSharedPtr mnet_p = read_multilayer("test/io4.mln","interdependent",',');
 	LayerSharedPtr A = mnet_p->get_layer("A");
@@ -61,7 +61,7 @@ void test_transformations() {
 	if (mnet_p->get_nodes(projected_layer).size() != 5) throw FailedUnitTestException("Wrong number of nodes");
 	if (mnet_p->get_edges(projected_layer,projected_layer).size() != 5) throw FailedUnitTestException("Wrong number of edges");
 	std::cout << "done!" << std::endl;
-*/
+
 	test_end("projection");
 }
 
