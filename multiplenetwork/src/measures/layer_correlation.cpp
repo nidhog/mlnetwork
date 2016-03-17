@@ -10,24 +10,55 @@
 #include "counter.h"
 #include <unordered_set>
 #include <algorithm>
+
 /*
  * #Added includes
  * */
 // #Revisit Dictionary-like stuff
-/*#include <iostream>
+#include <iostream>
 #include <map>
+#include <list>
 using namespace std;
 // typedef std::map<std::pair<int, int>, int> ActorDict;
-typedef std::map<int, double> DictById;
-typedef std::map<int, sorted_set<actor_id,double> > ListDictById;
-typedef DictById::const_iterator ItById;
-typedef ListDictById::const_iterator ListItById;
+typedef std::map<int, double> MapIntByInt;
+typedef std::map<int, double> MapDoubleByInt;
+typedef std::map<int,std::list<int> > MapListByInt;
+//typedef std::map<int, sorted_set<actor_id,double> > ListDictById;
+typedef MapIntByInt::const_iterator IteratorIntByInt;
+typedef MapDoubleByInt::const_iterator IteratorDoubleByInt;
+typedef MapListByInt::const_iterator IteratorListByInt;
+//typedef ListDictById::const_iterator ListItById;
 /**/
 
 namespace mlnet {
-double average_nearest_actor_centrality(const MLNetworkSharedPtr& mnet, const std::string centrality_measure = "DEGREE", const int level = 1, const bool exact_level = false){
+std::tuple<MapIntByInt, MapListByInt> get_actor_centralities(const MLNetworkSharedPtr& mnet, const std::string centrality_measure = "DEGREE"){
+	MapIntByInt actor_centralities;
+	MapListByInt actors_by_degrees;
+	std::tuple<MapIntByInt, MapListByInt> anac_tuple = std::make_tuple(actor_centralities, actors_by_degrees);
+	return anac_tuple;
+}
 
-	return 0;
+MapDoubleByInt get_average_nearest_actor_centralities(const MLNetworkSharedPtr& mnet, const std::string centrality_measure = "DEGREE", const int level = 1, const bool exact_level = false){
+	// initialize average nearest actor centrality map
+	MapDoubleByInt average_nearest_actor_centralities;
+	//average_nearest_actor_centralities[0]=1.0;
+	// get degrees by actor ids and actor ids for each degree
+	std::tuple<MapIntByInt, MapListByInt> anac_tuple = get_actor_centralities(mnet, centrality_measure);
+	MapIntByInt actor_centralities = std::get<0>(anac_tuple);
+	MapListByInt actors_by_degrees = std::get<1>(anac_tuple);
+	// iterate over degrees
+	return average_nearest_actor_centralities;
+}
+
+double average_nearest_actor_centrality(const MLNetworkSharedPtr& mnet, const std::string centrality_measure = "DEGREE", const int level = 1, const bool exact_level = false){
+	double average_measure = 0;
+	MapDoubleByInt average_nearest_actor_centralities = get_average_nearest_actor_centralities(mnet, centrality_measure, level, exact_level);
+	std::cout<<"Iterating over Averages by centralities...\n";
+	for (IteratorDoubleByInt iterator(average_nearest_actor_centralities.begin());
+			iterator != average_nearest_actor_centralities.end(); ++iterator){
+		std::cout<<"Degree: " <<iterator->first <<", Measure: " << iterator->second <<endl;
+	}
+	return average_measure;
 }
 double jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers) {
 	PairCounter<actor_id,actor_id> c;

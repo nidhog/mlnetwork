@@ -14,11 +14,11 @@ using namespace mlnet;
 void test_generation() {
 		test_begin("GENERATION");
 		log("[Generation Test R1] Testing average nearest actor centrality");
-			std::cout << "Reading the multilayer network...";
+			std::cout << "Reading the multilayer network...\n";
 			MLNetworkSharedPtr mnet = read_multilayer("test/io2.mpx","mlnet 2",',');
-			std::cout << "Testing degree...";
+			std::cout << "Testing degree...\n";
 			double measure = average_nearest_actor_centrality(mnet,"DEGREE",1,false);
-			std::cout << "done!" << std::endl;
+			std::cout << "Done!\n" << std::endl;
 			test_end("GENERATION");
 
 	}
