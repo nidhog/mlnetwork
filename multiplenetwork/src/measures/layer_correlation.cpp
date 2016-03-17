@@ -14,15 +14,21 @@
  * #Added includes
  * */
 // #Revisit Dictionary-like stuff
-#include <iostream>
+/*#include <iostream>
 #include <map>
+using namespace std;
 // typedef std::map<std::pair<int, int>, int> ActorDict;
 typedef std::map<int, double> DictById;
+typedef std::map<int, sorted_set<actor_id,double> > ListDictById;
 typedef DictById::const_iterator ItById;
+typedef ListDictById::const_iterator ListItById;
 /**/
 
 namespace mlnet {
+double average_nearest_actor_centrality(const MLNetworkSharedPtr& mnet, const std::string centrality_measure = "DEGREE", const int level = 1, const bool exact_level = false){
 
+	return 0;
+}
 double jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers) {
 	PairCounter<actor_id,actor_id> c;
 	int num_layers = layers.size();
@@ -222,18 +228,22 @@ double assortativity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer
  * #Added Assortativity
  *
  * */
-double actor_layer_centrality(ActorSharedPtr actor, LayerSharedPtr layer, std::string centrality_measure = "DEGREE"){
+/*double actor_layer_centrality(const ActorSharedPtr actor, const LayerSharedPtr layer, const std::string centrality_measure = "DEGREE"){
 	double node_centrality = 0;
 	//TODO Compute centrality
 	return node_centrality;
 }
-
-DictById get_actors_centralities(const MLNetworkSharedPtr& mnet, std::string centrality_measure = "DEGREE"){
+/*
+ *
+ */
+/*DictById get_actors_centralities(const MLNetworkSharedPtr& mnet, const std::string centrality_measure = "DEGREE"){
 	DictById actor_centralities;
 	// Iterate over actors
 	for (ActorSharedPtr actor : mnet -> get_actors()){
 		// Find centrality of actor
-		actor_id = actor.get_id();
+		int actor_id = actor.get_id();
+		// TODO == or !=
+		// add only if not found
 		if ( actor_centralities.find(actor_id) == actor_centralities.end() ) {
 			actor_centralities[actor_id] = 0;
 		}
@@ -244,7 +254,56 @@ DictById get_actors_centralities(const MLNetworkSharedPtr& mnet, std::string cen
 	//return dictionary with all actor centralities
 	return actor_centralities;
 }
+sorted_set<actor_id,ActorSharedPtr> get_neighbors_by_level(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const int level = 1, const bool exact_level = false){
+	sorted_set<actor_id,ActorSharedPtr> neighbors;
+	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
+				for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
+					// TODO repeated actors?
+						neighbors.insert(neighbor->actor->id,neighbor->actor);
+				}
+			}
+			return neighbors;
+}
+std::tuple<DictById, ListDictById> average_nn_centralities(const MLNetworkSharedPtr& mnet, const std::string centrality_measure = "DEGREE"){
+	DictById average_centralities;
+	ListDictById annc_measure;
+	DictById actor_centralities = get_actors_centralities(mnet, centrality_measure);
+	for(ActorSharedPtr actor : mnet -> get_actors()){
+		int actor_id = actor.get_id();
+		double sum = 0;
+		double total = 0;
+		for(ActorSharedPtr neighbor : get_neighbors_by_level(mnet, actor)){
+			sum += actor_centralities[neighbor];
+			total++;
+		}
+		if(total>0){
+			// TODO == or !=
+			// add only if not found
+			if ( average_centralities.find(actor_id) == average_centralities.end() ) {
+				double average = sum/total;
+				average_centralities[actor_id] = average;
+				double current_actor_centrality = actor_centralities[actor_id];
+				// TODO == or !=
+				// add only if not found
+				if ( annc_measure.find(current_actor_centrality) == annc_measure.end() ){
+					sorted_set<double> empty_list;
+					annc_measure[current_actor_centrality] = empty_list;
+				}
+				annc_measure[current_actor_centrality].insert(average);
+			}
+		}
+	}
+	return   std::make_tuple(average_centralities, annc_measure);
+}
 
+double actor_assortativity(){
+	// return average value of averages
+	double assortativity = 0;
+	return assortativity;
+}
+*/
+
+/*
 double general_assortativity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode) {
 	//std::cout << edges.size() << " " << flat.getNumEdges() << std::endl;
 	long num_actors_not_in_layer1 = 0;
@@ -315,7 +374,7 @@ double general_assortativity(const MLNetworkSharedPtr& mnet, const LayerSharedPt
 	else if (stdev1==0 || stdev2==0)
 		return 0;
 	else return covariance/stdev1/stdev2;
-}
+}*/
 /*
 double network_coverage(const MLNetwork& mnet, const std::set<std::string>& n1, const std::set<std::string>& n2) {
 	std::set<network_id> nets1, nets2;
