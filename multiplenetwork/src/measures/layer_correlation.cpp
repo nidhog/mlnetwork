@@ -93,11 +93,17 @@ std::tuple<MapIntByInt, MapListByInt> get_actor_centralities(const MLNetworkShar
 }
 std::list<int> get_neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const edge_mode mode){
 	std::list<int> neighbor_ids;
+	//debug prints
+	//std::cout<<"Getting neighbors of Actor:"<<endl;
+	//std::cout<< (actor->id)<<endl;
 	for(LayerSharedPtr layer : mnet -> get_layers()){
 		for(ActorSharedPtr neighbor : neighbors(mnet, actor, layer, mode)){
 			int neighbor_id = neighbor->id;
 			if(!((std::find(neighbor_ids.begin(), neighbor_ids.end(), neighbor_id) != neighbor_ids.end()))){
 				neighbor_ids.push_back(neighbor_id);
+		//debug prints
+		//		std::cout<<"Neighbor found: "<<endl;
+		//		std::cout<<neighbor_id<<endl;
 			}
 		}
 	}
@@ -144,14 +150,20 @@ MapDoubleByInt get_average_nearest_actor_centralities(const MLNetworkSharedPtr& 
 	return average_nearest_actor_centralities;
 }
 
-double average_nearest_actor_centrality(const MLNetworkSharedPtr& mnet, const std::string centrality_measure, const int level, const bool exact_level){
+double average_nearest_actor_centrality(const MLNetworkSharedPtr& mnet, const std::string centrality_measure, const int level, const bool exact_level, const std::string filename){
+	ofstream Morison_File ("test/output/"+filename);         //Opening file to print
+    Morison_File << "Degree, Measure" << endl; //Defining header
 	double average_measure = 0;
 	MapDoubleByInt average_nearest_actor_centralities = get_average_nearest_actor_centralities(mnet, centrality_measure, level, exact_level);
 	std::cout<<"Iterating over Averages by centralities...\n";
 	for (IteratorDoubleByInt iterator(average_nearest_actor_centralities.begin());
 			iterator != average_nearest_actor_centralities.end(); ++iterator){
-		std::cout<<"Degree: " <<iterator->first <<", Measure: " << iterator->second <<endl;
+		double degree = iterator->first;
+		double measure = iterator->second;
+		Morison_File<<degree<<","<<measure<<endl;
+		std::cout<<"Degree: " <<degree <<", Measure: " << measure <<endl;
 	}
+	Morison_File.close();
 	return average_measure;
 }
 double jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers) {

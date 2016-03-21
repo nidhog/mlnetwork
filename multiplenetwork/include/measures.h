@@ -61,7 +61,7 @@ double xrelevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, c
 /**********************************************************************/
 /** Layer comparison ************************************************/
 /**********************************************************************/
-double average_nearest_actor_centrality(const MLNetworkSharedPtr& mnet, const std::string centrality_measure = "DEGREE", const int level = 1, const bool exact_level = false);
+double average_nearest_actor_centrality(const MLNetworkSharedPtr& mnet, const std::string centrality_measure = "DEGREE", const int level = 1, const bool exact_level = false, const std::string filename = "output.csv");
 double jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers);
 double jaccard_similarity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 
@@ -71,7 +71,7 @@ double jaccard_triangle_similarity(const MLNetworkSharedPtr& mnet, const LayerSh
 double coverage(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 
 double assortativity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode);
-double general_assortativty(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode);
+
 
 // FROM HERE, PORTING NOT COMPLETED YET
 
