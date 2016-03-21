@@ -91,25 +91,48 @@ std::tuple<MapIntByInt, MapListByInt> get_actor_centralities(const MLNetworkShar
 	std::tuple<MapIntByInt, MapListByInt> anac_tuple = std::make_tuple(actor_centralities, actors_by_degrees);
 	return anac_tuple;
 }
-std::list<int> get_neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const edge_mode mode){
+std::list<int> get_neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const edge_mode mode,
+		const int level = 1, const bool exact_level = false){
 	std::list<int> neighbor_ids;
+	MapIntByInt neighborhood_level;
+
 	//debug prints
 	//std::cout<<"Getting neighbors of Actor:"<<endl;
 	//std::cout<< (actor->id)<<endl;
-	for(LayerSharedPtr layer : mnet -> get_layers()){
-		for(ActorSharedPtr neighbor : neighbors(mnet, actor, layer, mode)){
-			int neighbor_id = neighbor->id;
-			if(!((std::find(neighbor_ids.begin(), neighbor_ids.end(), neighbor_id) != neighbor_ids.end()))){
-				neighbor_ids.push_back(neighbor_id);
-		//debug prints
-		//		std::cout<<"Neighbor found: "<<endl;
-		//		std::cout<<neighbor_id<<endl;
+	//TODO #ToCheck if correct for at least level
+	//TODO add if exact_level
+		for(LayerSharedPtr layer : mnet -> get_layers()){
+			std::list<int> neighbor_layer_ids;
+			for(ActorSharedPtr neighbor : neighbors(mnet, actor, layer, mode)){
+				int neighbor_id = neighbor->id;
+				if(!((std::find(neighbor_layer_ids.begin(), neighbor_layer_ids.end(), neighbor_id) != neighbor_layer_ids.end())) ){
+					neighbor_layer_ids.push_back(neighbor_id);
+				}
 			}
-		}
-	}
+			for(int current_neighbor_id : neighbor_layer_ids){
+				if(neighborhood_level.find(current_neighbor_id) == neighborhood_level.end()){
+					neighborhood_level[current_neighbor_id]= 0;
+				}
+				neighborhood_level[current_neighbor_id]++;
+				if(neighborhood_level[current_neighbor_id]>=level and
+						!((std::find(neighbor_ids.begin(), neighbor_ids.end(), current_neighbor_id)
+							!= neighbor_ids.end())) ){
+					neighbor_ids.push_back(current_neighbor_id);
+				}
+			}
+		}/*// Level 1 at least
+		for(LayerSharedPtr layer : mnet -> get_layers()){
+			for(ActorSharedPtr neighbor : neighbors(mnet, actor, layer, mode)){
+				int neighbor_id = neighbor->id;
+				if(!((std::find(neighbor_ids.begin(), neighbor_ids.end(), neighbor_id) != neighbor_ids.end()))){
+					neighbor_ids.push_back(neighbor_id);
+				}
+			}
+		}*/
 	return neighbor_ids;
 }
-MapDoubleByInt get_average_nearest_actor_centralities(const MLNetworkSharedPtr& mnet, const std::string centrality_measure = "DEGREE", const int level = 1, const bool exact_level = false){
+MapDoubleByInt get_average_nearest_actor_centralities(const MLNetworkSharedPtr& mnet, const std::string centrality_measure = "DEGREE"
+		, const int level = 1, const bool exact_level = false){
 	// initialize average nearest actor centrality map
 	MapDoubleByInt average_nearest_actor_centralities;
 	//average_nearest_actor_centralities[0]=1.0;
@@ -129,7 +152,7 @@ MapDoubleByInt get_average_nearest_actor_centralities(const MLNetworkSharedPtr& 
 			//ToTest//std::cout<<actor_id<<endl;
 			double sum_of_neighbors = 0;
 			double total_of_neighbors = 0;
-			for(int neighbor_id : get_neighbors(mnet, mnet->get_actor(actor_id), INOUT)){
+			for(int neighbor_id : get_neighbors(mnet, mnet->get_actor(actor_id), INOUT, level, exact_level)){
 				sum_of_neighbors += actor_centralities[neighbor_id];
 				total_of_neighbors++;
 			}
@@ -150,8 +173,11 @@ MapDoubleByInt get_average_nearest_actor_centralities(const MLNetworkSharedPtr& 
 	return average_nearest_actor_centralities;
 }
 
-double average_nearest_actor_centrality(const MLNetworkSharedPtr& mnet, const std::string centrality_measure, const int level, const bool exact_level, const std::string filename){
-	ofstream Morison_File ("test/output/"+filename);         //Opening file to print
+double average_nearest_actor_centrality(const MLNetworkSharedPtr& mnet, const std::string centrality_measure, const int level, const bool exact_level, const std::string filename, const std::string file_extension){
+	ofstream Morison_File ("test/output/"+filename
+			+"_Lvl"+ std::to_string(level)
+			+((exact_level==false)?"":"_ExactLevel")
+			+"."+file_extension);         //Opening file to print
     Morison_File << "Degree, Measure" << endl; //Defining header
 	double average_measure = 0;
 	MapDoubleByInt average_nearest_actor_centralities = get_average_nearest_actor_centralities(mnet, centrality_measure, level, exact_level);
