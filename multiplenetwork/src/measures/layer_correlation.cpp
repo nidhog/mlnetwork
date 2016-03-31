@@ -51,13 +51,19 @@ double actor_centrality(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& ac
 	double actor_centrality = 0;
 	if (centrality_measure == "DEGREE"){
 			for(LayerSharedPtr layer : mnet -> get_layers()){
-				actor_centrality += node_centrality(mnet, actor, layer, "DEGREE");
+				double node_cent = node_centrality(mnet, actor, layer, "DEGREE");
+
+				actor_centrality += node_cent;
+				// actor_centrality /= ((node_cent>0)?node_cent:1);
 			}
 	}
 	else{
 		// default
 		for(LayerSharedPtr layer : mnet -> get_layers()){
-			actor_centrality += node_centrality(mnet, actor, layer, "DEGREE");
+			double node_cent = node_centrality(mnet, actor, layer, "DEGREE");
+
+			actor_centrality += node_cent;
+			// actor_centrality /= ((node_cent>0)?node_cent:1);
 		}
 	}
 	return actor_centrality;

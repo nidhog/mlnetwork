@@ -1,0 +1,15 @@
+11:22:11 **** Incremental Build of configuration Debug for project txt ****
+make all 
+Building file: ../src/txt.cpp
+Invoking: GCC C++ Compiler
+g++ -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/txt.d" -MT"src/txt.d" -o "src/txt.o" "../src/txt.cpp"
+Finished building: ../src/txt.cpp
+ 
+Building target: txt
+Invoking: GCC C++ Linker
+g++  -o "txt"  ./src/txt.o   
+Finished building target: txt
+ 
+
+11:22:11 Build Finished (took 474ms)
+

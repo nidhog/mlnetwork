@@ -1,0 +1,32 @@
+!SESSION 2016-02-18 11:11:27.963 -----------------------------------------------
+eclipse.buildId=debbuild
+java.version=1.7.0_85
+java.vendor=Oracle Corporation
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -data /home/nidhog/master_thesis/git-repo/mlnetwork/multiplenetwork -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.core.resources 4 77 2016-02-18 11:12:53.551
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2016-02-18 11:12:53.551
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2016-02-18 11:12:53.551
+!MESSAGE /home/nidhog/master_thesis/git-repo/mlnetwork overlaps the workspace location: /home/nidhog/master_thesis/git-repo/mlnetwork/multiplenetwork
+
+!ENTRY org.eclipse.cdt.core 1 0 2016-02-18 11:16:54.128
+!MESSAGE Indexed 'txt' (1 sources, 146 headers) in 11.02 sec: 9,692 declarations; 15,378 references; 0 unresolved inclusions; 6 syntax errors; 75 unresolved names (0.30%)
+!SESSION 2016-02-18 11:21:16.659 -----------------------------------------------
+eclipse.buildId=debbuild
+java.version=1.7.0_85
+java.vendor=Oracle Corporation
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.cdt.core 1 0 2016-02-18 11:22:01.791
+!MESSAGE Indexed 'txt' (1 sources, 100 headers) in 18.85 sec: 8,178 declarations; 14,195 references; 0 unresolved inclusions; 0 syntax errors; 2 unresolved names (0.01%)
+
+!ENTRY org.eclipse.core.resources 4 77 2016-02-18 15:54:35.905
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2016-02-18 15:54:35.905
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2016-02-18 15:54:35.905
+!MESSAGE /home/nidhog/master_thesis/git-repo/mlnetwork overlaps the workspace location: /home/nidhog/master_thesis/git-repo/mlnetwork/multiplenetwork
