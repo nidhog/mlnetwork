@@ -13,6 +13,7 @@
 
 #include <set>
 #include <vector>
+#include <string>
 #include "generation.h"
 #include "datastructures.h"
 #include "utils.h"
@@ -42,6 +43,51 @@ public:
 	virtual void evolution_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges) = 0;
 	virtual void init_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer) = 0;
 };
+// NetworkGenerationModel
+class NetworkGenerationModel {
+public:
+	virtual ~NetworkGenerationModel() = 0;
+	virtual MLNetworkSharedPtr generate() = 0;
+	virtual void set_params() = 0;
+
+};
+class Target {
+public:
+	virtual ~Target() = 0;
+
+};
+/*@brief Grows a network by copying a layer and molding the copied layer to achieve a desired target outcome*/
+class AdjustingModel : public NetworkGenerationModel {
+protected:
+	int number_of_layers, number_of_actors;
+	std::string *single_layer_models;
+	Target **interlayer_targets;
+	Target *intralayer_targets;
+public:
+	AdjustingModel(int number_of_layers, int number_of_actors,
+			std::string *single_layer_models,
+			Target **interlayer_targets,
+			Target *intralayer_targets);
+	~AdjustingModel();
+	void set_params(int number_of_layers, int number_of_actors,
+			std::string *single_layer_models,
+			Target **interlayer_targets, Target *intralayer_targets);
+};
+/*@brief Grows a network by copying a layer and molding the copied layer to achieve a desired target outcome*/
+class AdjustingCopyModel : public AdjustingModel {
+public:
+	AdjustingCopyModel(int number_of_layers, int number_of_actors,
+			std::string *single_layer_models,
+			Target **interlayer_targets, Target *intralayer_targets) : AdjustingModel(number_of_layers, number_of_actors,
+					single_layer_models,
+					interlayer_targets,
+					intralayer_targets){};
+	~AdjustingCopyModel();
+	void set_params(int number_of_layers, int number_of_actors,
+			std::string *single_layer_models,
+			Target **interlayer_targets, Target *intralayer_targets);
+};
+
 
 /**
  * @brief Grows a network by first creating a complete graph with m0 nodes, then adding a new node at a time and connecting it to m other nodes chosen with a probability proportional to their degree.

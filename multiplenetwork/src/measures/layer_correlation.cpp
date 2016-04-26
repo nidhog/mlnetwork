@@ -32,6 +32,30 @@ typedef MapListByInt::const_iterator IteratorListByInt;
 /**/
 
 namespace mlnet {
+/*BEGIN Properties*/
+void generate_intralayer_properties(const MLNetworkSharedPtr& mnet){
+	for(LayerSharedPtr layer : mnet -> get_layers()){
+
+	}
+}
+void generate_interlayer_properties(const MLNetworkSharedPtr& mnet, const std::string network_name){
+	layer_list layers_l = mnet->get_layers();
+	std::unordered_set<LayerSharedPtr> layers;
+	for(LayerSharedPtr layer : layers_l){
+		layers.insert(layer);
+	}
+
+	bool jaccard_mat = jaccard_similarity_matrix(mnet, layers, network_name);
+	bool jaccard_triangle_mat = jaccard_triangle_similarity_matrix(mnet, layers, network_name);
+	bool coverage_mat = coverage_matrix(mnet, layers, network_name);
+	bool assortativity_mat = assortativity_matrix(mnet, layers, network_name);
+}
+void generate_correlations_features(const MLNetworkSharedPtr& mnet){
+
+}
+/*END   Properties*/
+
+
 /*
  * Set to degree centrality by default*/
 double node_centrality(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor,
@@ -211,21 +235,17 @@ bool jaccard_similarity_matrix(const MLNetworkSharedPtr& mnet, const std::unorde
 	bool worked = false;
 	for (LayerSharedPtr layer : layers){
 		worked = false;
-		std::cout<<layer->id<<" :";
-		Morison_File <<layer->id<<" ,";
+		Morison_File <<layer->id<<"_"<<layer->name<<" ,";
 		for(LayerSharedPtr second_layer: layers){
 			double curr_sim = jaccard_similarity(mnet, layer, second_layer);
 			if(!worked){
-				std::cout<<curr_sim;
 				Morison_File<<curr_sim;
 				worked = true;
 			}
 			else{
-				std::cout<<", "<<curr_sim;
 				Morison_File<<", "<<curr_sim;
 			}
 		}
-		std::cout<<endl;
 		Morison_File<<endl;
 	}
 	return worked;
@@ -236,21 +256,17 @@ bool jaccard_triangle_similarity_matrix(const MLNetworkSharedPtr& mnet, const st
 	bool worked = false;
 	for (LayerSharedPtr layer : layers){
 		worked = false;
-		std::cout<<layer->id<<" :";
-		Morison_File <<layer->id<<" ,";
+		Morison_File <<layer->id<<"_"<<layer->name<<" ,";
 		for(LayerSharedPtr second_layer: layers){
 			double curr_sim = jaccard_triangle_similarity(mnet, layer, second_layer);
 			if(!worked){
-				std::cout<<curr_sim;
 				Morison_File<<curr_sim;
 				worked = true;
 			}
 			else{
-				std::cout<<", "<<curr_sim;
 				Morison_File<<", "<<curr_sim;
 			}
 		}
-		std::cout<<endl;
 		Morison_File<<endl;
 	}
 	return worked;
@@ -261,21 +277,17 @@ bool coverage_matrix(const MLNetworkSharedPtr& mnet, const std::unordered_set<La
 	bool worked = false;
 	for (LayerSharedPtr layer : layers){
 		worked = false;
-		std::cout<<layer->id<<" :";
-		Morison_File <<layer->id<<" ,";
+		Morison_File <<layer->id<<"_"<<layer->name<<" ,";
 		for(LayerSharedPtr second_layer: layers){
 			double curr_sim = coverage(mnet, layer, second_layer);
 			if(!worked){
-				std::cout<<curr_sim;
 				Morison_File<<curr_sim;
 				worked = true;
 			}
 			else{
-				std::cout<<", "<<curr_sim;
 				Morison_File<<", "<<curr_sim;
 			}
 		}
-		std::cout<<endl;
 		Morison_File<<endl;
 	}
 	return worked;
@@ -286,25 +298,67 @@ bool assortativity_matrix(const MLNetworkSharedPtr& mnet, const std::unordered_s
 	bool worked = false;
 	for (LayerSharedPtr layer : layers){
 		worked = false;
-		std::cout<<layer->id<<" :";
 		Morison_File <<layer->id<<" ,";
 		for(LayerSharedPtr second_layer: layers){
 			double curr_sim = assortativity(mnet, layer, second_layer, INOUT);
 			if(!worked){
-				std::cout<<curr_sim;
 				Morison_File<<curr_sim;
 				worked = true;
 			}
 			else{
-				std::cout<<", "<<curr_sim;
 				Morison_File<<", "<<curr_sim;
 			}
 		}
-		std::cout<<endl;
 		Morison_File<<endl;
 	}
 	return worked;
 }
+double jaccard_node_similarity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) {
+
+	long num_pairs = 0;
+	long num_matches = 0;
+	long num_sec = 0;
+	bool counted = false;
+	// for each of the edges in this layer, check which other layers contain it
+	for (NodeSharedPtr node1: mnet->get_nodes(layer1)) {
+		for (NodeSharedPtr node2: mnet-> get_nodes(layer2)){
+			if(!counted){num_sec++;}
+			if(node1->actor->id == node2->actor->id){
+				num_matches++;
+			}
+		}
+		if(!counted){counted=true;}
+		num_pairs++;
+	}
+
+	num_pairs = (num_pairs+num_sec-num_matches);
+	return double(num_matches)/(num_pairs);
+
+
+	/* verify if all networks are of the same kind
+	bool directed = mnet.getNetwork(*active_networks.begin()).isDirected();
+	std::set<network_id>::const_iterator it;
+	for (it=active_networks.begin()+1; it!=active_networks.end(); ++it) {
+		if (mnet.getNetwork(*it).isDirected() != directed)
+			throw OperationNotSupportedException("cannot compare directed networks with undirected ones");
+	}
+	Network flat = flatten_weighted(mnet, active_networks,false,false);
+	std::set<edge_id> edges = flat.getEdges();
+	//std::cout << edges.size() << " " << flat.getNumEdges() << std::endl;
+	long num_edges_on_all_networks = 0;
+	for (edge_id e: edges) {
+		if (flat.getEdgeWeight(e.v1,e.v2)==active_networks.size())
+			num_edges_on_all_networks++;
+	}
+	//std::cout << num_edges_on_all_networks << " " << edges.size() << std::endl;
+	return double(num_edges_on_all_networks)/mnet->getedges.size();
+
+	*/
+}
+
+
+
+
 double jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers) {
 	PairCounter<actor_id,actor_id> c;
 	int num_layers = layers.size();

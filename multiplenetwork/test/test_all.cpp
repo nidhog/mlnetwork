@@ -26,14 +26,16 @@ void test_end(const std::string& name) {
 int main(int argn, char* argv[]) {
 
 	try {
-	test_datastructures();
-	test_io();
+	//test_datastructures();
+	//test_io();
 	//test_measures();
 	//test_transformations();
-	test_community();
-	test_dynamics();
+	//test_community();
+	//test_dynamics();
 	//test_evolution();
-	test_generation();
+	//test_generation();
+	//test_properties();
+		test_double_layer();
 	/*
 	test_utils();
 	test_randomwalks();
