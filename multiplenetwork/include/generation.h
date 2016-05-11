@@ -151,6 +151,12 @@ void evolve_edge_copy(MLNetwork &mnet,
 		std::vector<double> pr_internal_event,
 		std::vector<std::vector<double> > dependency,
 		std::vector<EvolutionModel*> evolution_model);
+
+
+// #Added Adjusting Copy Model
+void benchmark_adjust_error(MLNetworkSharedPtr mnet,
+							const std::string filename,
+							const std::string file_extension);
 } // namespace
 
 #endif /* EVOLUTION_H_ */

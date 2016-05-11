@@ -9,9 +9,101 @@
 #include <vector>
 #include <iostream>
 #include "generation.h"
+#include "../../include/datastructures.h"
+#include "measures.h"
+#include "mlnetwork.h"
+#include <math.h>
 
 namespace mlnet {
 
+void rename_node(MLNetworkSharedPtr mnet, NodeSharedPtr s_node, LayerSharedPtr c_layer){
+	ActorSharedPtr new_actor = mnet->add_actor(s_node->actor->name+"mod");
+	NodeSharedPtr new_node = mnet->add_node(new_actor, c_layer);
+	for(NodeSharedPtr node: mnet->neighbors(s_node, INOUT)){
+		mnet->add_edge(node, new_node);
+	}
+
+	mnet->erase(s_node);
+}
+NodeSharedPtr select_node(MLNetworkSharedPtr mnet, node_list &list, double goal, long layer_id){
+	double d = INFINITY;
+	NodeSharedPtr s_node = list.get_at_index(0);
+	for(long i; i<list.size();i++){
+		NodeSharedPtr node = list.get_at_index(i);
+		if(node->layer->id == layer_id){
+			double new_d = abs(degree(mnet, node->actor, node->layer, INOUT)-goal);
+			if(new_d < d){
+				s_node = node;
+				d = new_d;
+			}
+		}
+	}
+	list.erase(s_node->id);
+	return s_node;
+}
+void adjust(MLNetworkSharedPtr mnet, double j_node, double j_edge){
+	double s = ((1-j_edge)*100)/(1+j_edge);
+	double sum = 0;
+	double n_to_rename = ((1-j_node)*100)/(1+j_node);
+	LayerSharedPtr c_layer = mnet->get_layer(1);
+	int i = 0;
+	double goal = 1;
+	node_list list = mnet->get_nodes();
+	while(i<n_to_rename){
+		goal = (s-sum)/(n_to_rename-i);
+		NodeSharedPtr s_node = select_node(mnet, list, goal, c_layer->id);
+		sum += degree(mnet, s_node->actor, s_node->layer, INOUT);
+		if(s_node->layer->id == c_layer->id){
+			rename_node(mnet, s_node, c_layer);
+			i++;
+		}
+
+	}
+	/*for(NodeSharedPtr s_node : mnet->get_nodes()){
+
+		if(s_node->layer->id == c_layer->id and i<30){
+			std::cout<<s_node->id<<std::endl;
+			std::cout<<s_node->layer->id<<std::endl;
+			ActorSharedPtr new_actor = mnet->add_actor(s_node->actor->name+"mod");
+			NodeSharedPtr new_node = mnet->add_node(new_actor, c_layer);
+			for(NodeSharedPtr node: mnet->neighbors(s_node, INOUT)){
+				mnet->add_edge(node, new_node);
+				EdgeSharedPtr er_edge = mnet->get_edge(node, s_node);
+				//bool erased = mnet->erase(er_edge);
+			}
+			i++;
+		}
+	}*/
+
+}
+void benchmark_adjust_error(MLNetworkSharedPtr mlnet,
+							const std::string filename,
+							const std::string file_extension){
+	std::ofstream Morison_File ("test/output/adjusting_error/"+filename
+						   +"_Table."+file_extension);         //Opening file to print
+	Morison_File << "jnode, jedge, error_jnode, error_jedge, assort" << std::endl; //Defining header
+
+	for(double j_node=0.01; j_node<=0.91; j_node+=0.1){
+		for(double j_edge=0.01; j_edge <=0.91; j_edge+=0.1){
+			MLNetworkSharedPtr mnet = read_multilayer("test/data/ACModel_BA_copy.csv","mlnet 2",',');
+			adjust(mnet, j_node, j_edge);
+			LayerSharedPtr layer1 = mnet->get_layer(1);
+			LayerSharedPtr layer2 = mnet->get_layer(2);
+			double jaccard_node_sim = jaccard_node_similarity(mnet, layer1, layer2);
+			double jaccard_sim = jaccard_similarity(mnet, layer1, layer2);
+			double assort = assortativity(mnet, layer1, layer2, INOUT);
+
+			std::cout<<"-----------------"<<std::endl;
+			std::cout<<"[!] - "<<j_node<<"--"<<j_edge<<std::endl;
+			std::cout<<"similarity:"<<std::endl;
+			std::cout<<jaccard_sim<<std::endl;
+			std::cout<<jaccard_node_sim<<std::endl;
+			std::cout<<assort<<std::endl;
+			Morison_File<<j_node<<","<<j_edge<<","<<fabs(jaccard_node_sim-j_node)<<","<<fabs(jaccard_sim-j_edge)<<","<<assort<<std::endl;
+		}
+	}
+	Morison_File.close();
+}
 void evolve(MLNetworkSharedPtr mnet,
 		long num_of_steps,
 		long num_initial_actors,
