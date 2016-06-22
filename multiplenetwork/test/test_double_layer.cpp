@@ -1,6 +1,7 @@
 
 #include "test.h"
 #include "mlnetwork.h"
+#include "../include/mlnetwork.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <set>
@@ -14,7 +15,7 @@ void test_double_layer() {
 	{
 	log("[Double Layer Split Evolution] basic double layer split evolution model");
 	// create multiplex network
-	MLNetworkSharedPtr mnet = read_multilayer("test/data/Higgs.csv","mlnet 2",',');
+	MLNetworkSharedPtr mnet = read_multilayer("test/data/ACModel_BA_copy.csv","mlnet 2",',');
 
 	// BEGIN Getting Layers
 	layer_list layers_l = mnet->get_layers();
@@ -23,7 +24,7 @@ void test_double_layer() {
 		layers.insert(layer);
 	}
 	// END Getting Layers
-
+/*
 	std::cout<<"[.] NODE Jaccard :"<<std::endl;
 	for(LayerSharedPtr layer1 : layers){
 
@@ -44,8 +45,9 @@ void test_double_layer() {
 
 		}
 		std::cout<<std::endl;
-	}
-
+	}*/
+		benchmark_adjust_error(mnet, "ACModel_BA_copy", "csv");
+		//benchmark_dissortative_swap(mnet, "ACModel_BA_copy", "csv");
 	}
 }
 

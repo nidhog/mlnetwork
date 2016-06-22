@@ -41,6 +41,27 @@ NodeSharedPtr select_node(MLNetworkSharedPtr mnet, node_list &list, double goal,
 	list.erase(s_node->id);
 	return s_node;
 }
+void swap(MLNetworkSharedPtr mnet, ActorSharedPtr actor_1, ActorSharedPtr actor_2, LayerSharedPtr layer){
+/*
+	NodeSharedPtr node_1 = mnet->get_node(actor_1, layer);
+	NodeSharedPtr node_2 = mnet->get_node(actor_2, layer);
+	node_1->actor=actor_2;
+	node_2->actor=actor_1;*/
+	NodeSharedPtr node_2 = mnet->get_node(actor_2, layer);
+	NodeSharedPtr node_1 = mnet->get_node(actor_1, layer);
+	node_list neighbors_1 = mnet->neighbors(node_1, INOUT);
+	node_list copy = neighbors_1;
+	for(NodeSharedPtr node: mnet->neighbors(node_2, INOUT)){
+		mnet->add_edge(node, node_1);
+	}
+	long copy_size = copy.size();
+	for(long i = 0; i<copy_size; i++){
+		NodeSharedPtr neighbor = copy.get_at_index(i);
+		mnet->add_edge(neighbor, node_2);
+	}
+
+
+}
 void adjust(MLNetworkSharedPtr mnet, double j_node, double j_edge){
 	double s = ((1-j_edge)*100)/(1+j_edge);
 	double sum = 0;
@@ -76,6 +97,43 @@ void adjust(MLNetworkSharedPtr mnet, double j_node, double j_edge){
 	}*/
 
 }
+
+void dissortative_swap(MLNetworkSharedPtr mnet){
+	actor_list actor_list = mnet->get_actors();
+	ActorSharedPtr actor_1 = actor_list.get_at_random();
+	ActorSharedPtr actor_2 = actor_list.get_at_random();
+	if (actor_1 != actor_2){
+		LayerSharedPtr layer_1 = mnet->get_layer(1);
+		LayerSharedPtr layer_2 = mnet->get_layer(2);
+		double deg_actor1_layer1 = degree(mnet, actor_1, layer_1, INOUT);
+		double deg_actor1_layer2 = degree(mnet, actor_1, layer_2, INOUT);
+		double deg_actor2_layer1 = degree(mnet, actor_2, layer_1, INOUT);
+		double deg_actor2_layer2 = degree(mnet, actor_2, layer_2, INOUT);
+		if(fabs(deg_actor1_layer1-deg_actor1_layer2)<=fabs(deg_actor1_layer1-deg_actor2_layer2)
+		   or fabs(deg_actor2_layer1-deg_actor2_layer2)<fabs(deg_actor2_layer1-deg_actor1_layer2)){
+			std::cout<<"[!]  ("<<deg_actor1_layer2<<","<<deg_actor2_layer2<<")   >>";
+			swap(mnet, actor_1, actor_2, layer_2);
+			std::cout<<"("<<degree(mnet, actor_1, layer_2, INOUT)<<","<<degree(mnet, actor_2, layer_2, INOUT)<<")"<<std::endl;
+		}
+	}
+}
+void assortative_swap(MLNetworkSharedPtr mnet){
+
+}
+void adjust_assortativity(MLNetworkSharedPtr mnet, double assort, double max_iterations = 1000, double difference = 0.1) {
+	LayerSharedPtr layer1 = mnet->get_layer(1);
+	LayerSharedPtr layer2 = mnet->get_layer(2);
+	double current_assort = assortativity(mnet, layer1, layer2, INOUT);
+	for(int i =1; i<=max_iterations; i++){
+		if(current_assort>assort+difference){
+			dissortative_swap(mnet);
+		}
+		else if(current_assort<assort-difference){
+			assortative_swap(mnet);
+		}
+	}
+}
+
 void benchmark_adjust_error(MLNetworkSharedPtr mlnet,
 							const std::string filename,
 							const std::string file_extension){
@@ -95,15 +153,51 @@ void benchmark_adjust_error(MLNetworkSharedPtr mlnet,
 
 			std::cout<<"-----------------"<<std::endl;
 			std::cout<<"[!] - "<<j_node<<"--"<<j_edge<<std::endl;
-			std::cout<<"similarity:"<<std::endl;
+			std::cout<<"jedge: ";
 			std::cout<<jaccard_sim<<std::endl;
+			std::cout<<"jnode: ";
 			std::cout<<jaccard_node_sim<<std::endl;
+			std::cout<<"assort: ";
 			std::cout<<assort<<std::endl;
 			Morison_File<<j_node<<","<<j_edge<<","<<fabs(jaccard_node_sim-j_node)<<","<<fabs(jaccard_sim-j_edge)<<","<<assort<<std::endl;
 		}
 	}
 	Morison_File.close();
 }
+void benchmark_dissortative_swap(MLNetworkSharedPtr mlnet,
+									 const std::string filename,
+									 const std::string file_extension){
+		std::ofstream Morison_File ("test/output/adjusting_error/Dissortative_"+filename
+									+"_Table."+file_extension);         //Opening file to print
+		Morison_File << "assort, jnode, jedge, error_assort" << std::endl; //Defining header
+	for(double max_iter = 10; max_iter<100; max_iter*=10){
+		std::cout<<"============================="<<max_iter<<"============"<<std::endl;
+
+		for(double assort = 0.01; assort<=0.91; assort+=0.1){
+			MLNetworkSharedPtr mnet = read_multilayer("test/data/ACModel_BA_copy.csv","mlnet 2",',');
+			adjust_assortativity(mnet, assort, max_iter);
+
+			LayerSharedPtr layer1 = mnet->get_layer(1);
+			LayerSharedPtr layer2 = mnet->get_layer(2);
+			double jaccard_node_sim = jaccard_node_similarity(mnet, layer1, layer2);
+			double jaccard_sim = jaccard_similarity(mnet, layer1, layer2);
+			double current_assort = assortativity(mnet, layer1, layer2, INOUT);
+
+			std::cout<<"-----------------"<<std::endl;
+			std::cout<<"[!] - "<<assort<<std::endl;
+			std::cout<<"jnode: ";
+			std::cout<<jaccard_node_sim<<std::endl;
+			std::cout<<"jedge: ";
+			std::cout<<jaccard_sim<<std::endl;
+			std::cout<<"assort: ";
+			std::cout<<current_assort<<std::endl;
+			Morison_File<<assort<<","<<jaccard_node_sim<<","<<jaccard_sim<<","<<fabs(current_assort-assort)<<std::endl;
+
+		}
+	}
+
+
+	}
 void evolve(MLNetworkSharedPtr mnet,
 		long num_of_steps,
 		long num_initial_actors,

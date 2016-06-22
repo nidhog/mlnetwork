@@ -154,6 +154,10 @@ void evolve_edge_copy(MLNetwork &mnet,
 
 
 // #Added Adjusting Copy Model
+void adjust(MLNetworkSharedPtr mnet, double j_node, double j_edge);
+void benchmark_dissortative_swap(MLNetworkSharedPtr mnet,
+							const std::string filename,
+							const std::string file_extension);
 void benchmark_adjust_error(MLNetworkSharedPtr mnet,
 							const std::string filename,
 							const std::string file_extension);
