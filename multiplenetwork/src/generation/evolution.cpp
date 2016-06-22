@@ -123,7 +123,7 @@ void assortative_swap(MLNetworkSharedPtr mnet){
 void adjust_assortativity(MLNetworkSharedPtr mnet, double assort, double max_iterations = 1000, double difference = 0.1) {
 	LayerSharedPtr layer1 = mnet->get_layer(1);
 	LayerSharedPtr layer2 = mnet->get_layer(2);
-	double current_assort = assortativity(mnet, layer1, layer2, INOUT);
+	double current_assort = pearson_degree(mnet, layer1, layer2, INOUT);
 	for(int i =1; i<=max_iterations; i++){
 		if(current_assort>assort+difference){
 			dissortative_swap(mnet);
@@ -144,12 +144,18 @@ void benchmark_adjust_error(MLNetworkSharedPtr mlnet,
 	for(double j_node=0.01; j_node<=0.91; j_node+=0.1){
 		for(double j_edge=0.01; j_edge <=0.91; j_edge+=0.1){
 			MLNetworkSharedPtr mnet = read_multilayer("test/data/ACModel_BA_copy.csv","mlnet 2",',');
-			adjust(mnet, j_node, j_edge);
 			LayerSharedPtr layer1 = mnet->get_layer(1);
 			LayerSharedPtr layer2 = mnet->get_layer(2);
-			double jaccard_node_sim = jaccard_node_similarity(mnet, layer1, layer2);
-			double jaccard_sim = jaccard_similarity(mnet, layer1, layer2);
-			double assort = assortativity(mnet, layer1, layer2, INOUT);
+			double assort = pearson_degree(mnet, layer1, layer2, INOUT);
+			std::cout<<"---------START--------"<<std::endl;
+			std::cout<<"assort: ";
+			std::cout<<assort<<std::endl;
+			adjust(mnet, j_node, j_edge);
+			layer1 = mnet->get_layer(1);
+			layer2 = mnet->get_layer(2);
+			double jaccard_node_sim = jaccard_actor(mnet, layer1, layer2);
+			double jaccard_sim = jaccard_edge(mnet, layer1, layer2);
+			assort = pearson_degree(mnet, layer1, layer2, INOUT);
 
 			std::cout<<"-----------------"<<std::endl;
 			std::cout<<"[!] - "<<j_node<<"--"<<j_edge<<std::endl;
@@ -179,9 +185,9 @@ void benchmark_dissortative_swap(MLNetworkSharedPtr mlnet,
 
 			LayerSharedPtr layer1 = mnet->get_layer(1);
 			LayerSharedPtr layer2 = mnet->get_layer(2);
-			double jaccard_node_sim = jaccard_node_similarity(mnet, layer1, layer2);
-			double jaccard_sim = jaccard_similarity(mnet, layer1, layer2);
-			double current_assort = assortativity(mnet, layer1, layer2, INOUT);
+			double jaccard_node_sim = jaccard_actor(mnet, layer1, layer2);
+			double jaccard_sim = jaccard_edge(mnet, layer1, layer2);
+			double current_assort = pearson_degree(mnet, layer1, layer2, INOUT);
 
 			std::cout<<"-----------------"<<std::endl;
 			std::cout<<"[!] - "<<assort<<std::endl;

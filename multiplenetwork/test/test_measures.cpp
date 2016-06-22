@@ -60,18 +60,32 @@ void test_measures() {
 	if (xrelevance(mnet,u1,layers,INOUT) != 1) throw FailedUnitTestException("Wrong exclusive relevance, both layers: " + to_string(xrelevance(mnet,u1,layers,INOUT)));
 	std::cout << "done!" << std::endl;
 
-	std::cout << "Testing jaccard similarity...";
+	std::cout << "Testing actor jaccard similarity...";
 	MLNetworkSharedPtr mnet5 = read_multilayer("test/io5.mpx","mlnet 5",',');
-	if (jaccard_similarity(mnet5,layers) != 4.0/7.0) throw FailedUnitTestException("Wrong layer similarity");
+	if (jaccard_actor(mnet5,l1,l2) != 5.0/6.0) throw FailedUnitTestException("Wrong jaccard actor layer similarity");
+	std::cout << "done!" << std::endl;
+
+	std::cout << "Testing edge jaccard similarity...";
+	if (jaccard_edge(mnet5,l1,l2) != 4.0/8.0) throw FailedUnitTestException("Wrong jaccard edge layer similarity");
 	std::cout << "done!" << std::endl;
 
 	std::cout << "Testing triangle jaccard similarity...";
-	if (jaccard_triangle_similarity(mnet5,layers) != 1.0/2.0) throw FailedUnitTestException("Wrong jaccard triangle layer similarity: " + to_string(jaccard_triangle_similarity(mnet5,layers)));
+	if (jaccard_triangle(mnet5,l1,l2) != 1.0/2.0) throw FailedUnitTestException("Wrong jaccard triangle layer similarity: " + to_string(jaccard_triangle(mnet5,l1,l2)));
 	std::cout << "done!" << std::endl;
 
+	std::cout << "Assortativity: " << pearson_degree(mnet5,l1,l2,INOUT) << std::endl;
+	std::cout << "Rank correlation: " << rho_degree(mnet5,l1,l2,INOUT) << std::endl;
+
+	property_matrix<ActorSharedPtr,LayerSharedPtr,double> P(mnet->get_actors().size(),mnet->get_layers().size(),0);
+	for (NodeSharedPtr node: mnet5->get_nodes(l1)) {
+		P.set(node->actor,l1,mnet5->neighbors(node,INOUT).size());
+	}
+	for (NodeSharedPtr node: mnet5->get_nodes(l2)) {
+		P.set(node->actor,l2,mnet5->neighbors(node,INOUT).size());
+	}
 	std::cout << "Computing multilayer distance between all pairs of vertexes...";
 	// The result is stored in the variable paths, where for each target vertex (from source U0) we obtain a set of shortest paths
-	hash<ActorSharedPtr,std::set<distance> > dists = pareto_distance(mnet, mnet->get_actor("U0"));
+	hashtable<ActorSharedPtr,std::set<path_length> > dists = pareto_distance(mnet, mnet->get_actor("U0"));
 	std::cout << "done!" << std::endl;
 
 	for (auto p: dists) {
@@ -82,8 +96,8 @@ void test_measures() {
 
 	std::cout << "Testing sample values (U0->U3: 2 shortest paths expected)...";
 	if (dists[mnet->get_actor("U3")].size()!=2) throw FailedUnitTestException("Expected 2 distances, found " + to_string(dists[mnet->get_actor("U3")].size()));
-	distance p1 = *dists[mnet->get_actor("U3")].begin();
-	distance p2 = *++dists[mnet->get_actor("U3")].begin();
+	path_length p1 = *dists[mnet->get_actor("U3")].begin();
+	path_length p2 = *++dists[mnet->get_actor("U3")].begin();
 	if (p1.length()!=2) throw FailedUnitTestException("Wrong length: distance 1, " + to_string(p1.length()));
 	if (p2.length()!=2) throw FailedUnitTestException("Wrong length: distance 2, " + to_string(p2.length()));
 	if (p1.length(l1,l1)!=2) throw FailedUnitTestException("Wrong number of edges: distance 1 on layer l1");
@@ -93,6 +107,36 @@ void test_measures() {
 	std::cout << "done!" << std::endl;
 
 	test_end("Actor measures");
+
+
+	// TMP Code
+
+	MLNetworkSharedPtr lnet = MLNetwork::create("friends");
+	ActorSharedPtr a1 = lnet->add_actor("a1");
+	ActorSharedPtr a2 = lnet->add_actor("a2");
+	ActorSharedPtr a3 = lnet->add_actor("a3");
+	ActorSharedPtr a4 = lnet->add_actor("a4");
+	ActorSharedPtr a5 = lnet->add_actor("a5");
+	ActorSharedPtr a6 = lnet->add_actor("a6");
+	ActorSharedPtr a7 = lnet->add_actor("a7");
+	LayerSharedPtr l = lnet->add_layer("l1",false);
+	NodeSharedPtr l1v1 = lnet->add_node(a1,l);
+	NodeSharedPtr l1v2 = lnet->add_node(a2,l);
+	NodeSharedPtr l1v3 = lnet->add_node(a3,l);
+	NodeSharedPtr l1v4 = lnet->add_node(a4,l);
+	NodeSharedPtr l1v5 = lnet->add_node(a5,l);
+	NodeSharedPtr l1v6 = lnet->add_node(a6,l);
+	NodeSharedPtr l1v7 = lnet->add_node(a7,l);
+	EdgeSharedPtr e1 = lnet->add_edge(l1v1,l1v2);
+	EdgeSharedPtr e2 = lnet->add_edge(l1v2,l1v3);
+	EdgeSharedPtr e3 = lnet->add_edge(l1v3,l1v1);
+	EdgeSharedPtr e4 = lnet->add_edge(l1v2,l1v4);
+	EdgeSharedPtr e5 = lnet->add_edge(l1v1,l1v5);
+	EdgeSharedPtr e6 = lnet->add_edge(l1v5,l1v6);
+	EdgeSharedPtr e7 = lnet->add_edge(l1v6,l1v7);
+	EdgeSharedPtr e8 = lnet->add_edge(l1v7,l1v5);
+
+	multiforce(lnet,10,10,20);
 
 }
 

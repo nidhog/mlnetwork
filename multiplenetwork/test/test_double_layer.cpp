@@ -13,7 +13,7 @@ using namespace mlnet;
 
 void test_double_layer() {
 	{
-	log("[Double Layer Split Evolution] basic double layer split evolution model");
+	log(1);
 	// create multiplex network
 	MLNetworkSharedPtr mnet = read_multilayer("test/data/ACModel_BA_copy.csv","mlnet 2",',');
 

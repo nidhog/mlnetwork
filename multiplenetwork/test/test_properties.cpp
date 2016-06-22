@@ -14,8 +14,8 @@ using namespace mlnet;
 
 void test_properties() {
 		test_begin("PROPERTIES");
-		log("[Generation Test transp_London] Testing average nearest actor centrality");
-
+		log(1);
+/*MERGE TODO
 		const std::string test_networks[] = {"test/data/transp_London.csv", "test/data/transp_Airlines.csv",	"test/data/Arxiv.csv"
 				, "test/data/Padgett.csv", "test/data/multi_BA_BA.csv", "test/data/multi_ER_ER.csv"
 				, "test/data/TwYtFf.csv", "test/data/Higgs.csv", "test/data/Arabidopsis.csv"};
@@ -57,7 +57,7 @@ void test_properties() {
 			generate_intralayer_properties(mnet);
 			generate_interlayer_properties(mnet, name_map[network_path]);
 			generate_correlations_features(mnet);
-		}
+		}/*
 			/*std::cout << "Reading the multilayer network...\n";
 			MLNetworkSharedPtr mnet = read_multilayer("test/data/transp_London.csv","mlnet 2",',');
 			std::cout << "Testing degree...\n";

@@ -10,7 +10,7 @@
 
 using namespace mlnet;
 
-void test_generation() {
+void test_generation() {/*
 		test_begin("GENERATION");
 		bool exact_level = false;
 		int level = 1;
@@ -22,7 +22,7 @@ void test_generation() {
 		log("[Generation Test Higgs 2] Testing average nearest actor centrality");
 			std::cout << "Testing 3 level degree...\n";
 			measure = average_nearest_actor_centrality(mnet,"DEGREE",3,exact_level, "higgs");
-			std::cout << "Done!\n" << std::endl;*/
+			std::cout << "Done!\n" << std::endl;*//*
 		log("[Generation Test transp_London] Testing average nearest actor centrality");
 			std::cout << "Reading the multilayer network...\n";
 			MLNetworkSharedPtr mnet = read_multilayer("test/data/transp_London.csv","mlnet 2",',');
@@ -268,7 +268,7 @@ void test_generation() {
 					assortativity_mat = assortativity_matrix(mnet, layers11, "Wiring");
 					std::cout << "Testing jaccard similarity...\n";
 			std::cout << "Done!\n" << std::endl;
-			test_end("GENERATION");
+			test_end("GENERATION");*/
 
 	}
 

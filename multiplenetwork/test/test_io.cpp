@@ -37,7 +37,7 @@ void test_io() {
 
 	std::cout << "Reading network io3 from file...";
 	MLNetworkSharedPtr mnet3 = read_multilayer("test/io3.mpx","mlnet 3",',');
-	if (mnet3->get_actors().size()!=6 ||
+	if (mnet3->get_actors().size()!=7 ||
 		mnet3->get_layers().size()!=2 ||
 		mnet3->get_nodes().size()!=8 ||
 		mnet3->get_edges().size()!=7) throw FailedUnitTestException("Could not retrieve all network components");
@@ -60,23 +60,34 @@ void test_io() {
 	std::cout << "done!" << std::endl;
 
 	std::cout << "Writing to file and reloading a multilayer network (native format)...";
-	write_multilayer(mnet3,"_tmp_file1.gml",',');
-	MLNetworkSharedPtr mnet4 = read_multilayer("_tmp_file1.gml","tmp",',');
-	if (mnet4->get_actors().size()!=6 ||
+	write_multilayer(mnet3,"_tmp_file1.mln",',');
+	MLNetworkSharedPtr mnet4 = read_multilayer("_tmp_file1.mln","tmp",',');
+	if (mnet4->get_actors().size()!=7 ||
 		mnet4->get_layers().size()!=2 ||
 		mnet4->get_nodes().size()!=8 ||
 		mnet4->get_edges().size()!=7) throw FailedUnitTestException("Could not retrieve all network components");
-	std::remove("_tmp_file1.gml");
+	std::remove("_tmp_file1.mln");
 	std::cout << "done!" << std::endl;
+
 	std::cout << "Writing a graphml file...";
-	std::unordered_set<LayerSharedPtr> layers;
+	simple_set<LayerSharedPtr> layers;
 	for (LayerSharedPtr layer: mnet3->get_layers())
 		layers.insert(layer);
-	write_graphml(mnet3,layers,"_tmp_file2.gml",true);
+	write_graphml(mnet3,"_tmp_file2.gml",layers,true,true);
 	std::remove("_tmp_file2.gml");
-	write_graphml(mnet3,layers,"_tmp_file3.gml",false);
+	write_graphml(mnet3,"_tmp_file3.gml",layers,false,false);
 	std::remove("_tmp_file3.gml");
 	std::cout << "done!" << std::endl;
+
+	/*
+	 * These functions can be checked by loading the files using another library,
+	 * e.g., with igraph in R: g <- read.graph("pr2.gml",format="graphml"), and checking
+	 * if all the information is preserved.
+	 */
+	//write_graphml(mnet3,"pr1.gml",layers,true,true);
+	//write_graphml(mnet3,"pr2.gml",layers,true,false);
+	//write_graphml(mnet3,"pr3.gml",layers,false,true);
+	//write_graphml(mnet3,"pr4.gml",layers,false,false);
 
 	test_end("IO");
 }

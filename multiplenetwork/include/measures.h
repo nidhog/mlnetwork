@@ -2,12 +2,12 @@
  * measures.h
  *
  * Author: Matteo Magnani <matteo.magnani@it.uu.se>
- * Version: beta
+ * Version: 1.0
  *
  * Social Network Analysis measures for multiplex networks.
  * TESTED:
- * Node based: degree, neighborhood, exclusive neighborhood, network relevance, exclusive network relevance
- * Network based: similarity
+ * Node based: degree, neighborhood, exclusive neighborhood, relevance, exclusive relevance
+ * Layer based: similarity
  *
  * TO BE CONSOLIDATED:
  * Distance based: Pareto distance, Pareto betweenness
@@ -16,8 +16,8 @@
  * References to be added.
  */
 
-#ifndef MULTIPLENETWORK_MEASURES_H_
-#define MULTIPLENETWORK_MEASURES_H_
+#ifndef MLNET_MEASURES_H_
+#define MLNET_MEASURES_H_
 
 #include <exception>
 #include <string>
@@ -30,32 +30,32 @@ namespace mlnet {
 /** Degree  ***********************************************************/
 /**********************************************************************/
 
-long degree(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode);
+long degree(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const simple_set<LayerSharedPtr>& layers, edge_mode mode);
 long degree(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
-double degree_mean(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode);
+double degree_mean(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const simple_set<LayerSharedPtr>& layers, edge_mode mode);
 double degree_deviation(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode);
 
-std::unordered_map<ActorSharedPtr, int > occupation(const MLNetworkSharedPtr& mnet, double teleportation, matrix<double> transitions, int num_steps);
+hashtable<ActorSharedPtr, int> occupation(const MLNetworkSharedPtr& mnet, double teleportation, matrix<double> transitions, int num_steps);
 
 /**********************************************************************/
 /** Neighborhood ******************************************************/
 /**********************************************************************/
 
-sorted_set<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode);
-sorted_set<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
+actor_list neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const simple_set<LayerSharedPtr>& layers, edge_mode mode);
+actor_list neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
-sorted_set<actor_id,ActorSharedPtr> xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode);
-sorted_set<actor_id,ActorSharedPtr> xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
+actor_list xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const simple_set<LayerSharedPtr>& layers, edge_mode mode);
+actor_list xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
 /**********************************************************************/
 /** Layer relevance *************************************************/
 /**********************************************************************/
 
-double relevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode);
+double relevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const simple_set<LayerSharedPtr>& layers, edge_mode mode);
 double relevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
-double xrelevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode);
+double xrelevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const simple_set<LayerSharedPtr>& layers, edge_mode mode);
 double xrelevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
 /**********************************************************************/
@@ -78,15 +78,36 @@ double jaccard_node_similarity(const MLNetworkSharedPtr& mnet, const LayerShared
 
 // #Added END
 
-double jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers);
-double jaccard_similarity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+/**
+ * @param mnet
+ * @param layers
+ * @return , or 0 if all layers have no actors.
+ */
+double jaccard_actor(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double jaccard_edge(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double jaccard_triangle(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double jaccard_triangle(const MLNetworkSharedPtr& mnet, const simple_set<LayerSharedPtr>& layers);
+double coverage_actor(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double coverage_edge(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double coverage_triangle(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double simple_matching_actor(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double simple_matching_edge(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double simple_matching_triangle(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double russell_rao_actor(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double russell_rao_edge(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double russell_rao_triangle(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double kulczynski2_actor(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double kulczynski2_edge(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double kulczynski2_triangle(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 
-double jaccard_triangle_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers);
-double jaccard_triangle_similarity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 
-double coverage(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 
-double assortativity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode);
+double pearson_degree(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode);
+double rho_degree(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode);
+
+// some utility functions
+property_matrix<ActorSharedPtr,LayerSharedPtr,bool> actor_existence_property_matrix(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+property_matrix<dyad,LayerSharedPtr,bool> edge_existence_property_matrix(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 
 
 // FROM HERE, PORTING NOT COMPLETED YET
@@ -95,7 +116,7 @@ double assortativity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer
 /** Distances *********************************************************/
 /**********************************************************************/
 
-std::unordered_map<ActorSharedPtr,std::set<distance> > pareto_distance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& from);
+hashtable<ActorSharedPtr,std::set<path_length> > pareto_distance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& from);
 /*
 std::map<actor_id,std::set<Path> > pareto_distance_all_paths(const MLNetworkSharedPtr& mnet, actor_id vertex);
 */
@@ -119,10 +140,8 @@ int check_dominance(const Path& p1, const Path& p2);
 /** Clustering ********************************************************/
 /**********************************************************************/
 
-double modularity(MLNetworkSharedPtr mnet, const hash<NodeSharedPtr,long>& groups, double c);
-
-//std::vector<long> distribution(long (*f)(const MLNetworkSharedPtr, global_identity, const std::set<layer_id>&));
+double modularity(const MLNetworkSharedPtr& mnet, const hashtable<NodeSharedPtr,long>& groups, double c);
 
 } // namespace mlnet
 
-#endif /* MULTIPLENETWORK_MEASURES_H_ */
+#endif /* MLNET_MEASURES_H_ */
